@@ -200,13 +200,14 @@ export const TherapistDashboard: React.FC<{ onBack?: () => void }> = ({ onBack }
               <div className="space-y-3">
                 {pendingRequests.map(req => (
                   <div key={req.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-start gap-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                       <div className="flex-1">
                         <div className="font-medium text-gray-900">
-                          {req.users?.email || req.user_id}
+                          {req.users?.username || req.users?.email || req.user_id}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          {new Date(req.created_at).toLocaleString()}
+                          {req.users?.email && <div>{req.users.email}</div>}
+                          <div>{new Date(req.created_at).toLocaleString()}</div>
                         </div>
                         {req.message && (
                           <div className="mt-2 text-sm text-gray-700 bg-white p-3 rounded border border-gray-200">
@@ -214,20 +215,20 @@ export const TherapistDashboard: React.FC<{ onBack?: () => void }> = ({ onBack }
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col space-y-2 min-w-[140px]">
+                      <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
                         <Button 
                           onClick={() => { 
                             handleAccept(req.id); 
                             openChatWith(req.user_id); 
                           }} 
-                          className="bg-green-600 text-white hover:bg-green-700"
+                          className="flex-1 sm:flex-none bg-green-600 text-white hover:bg-green-700"
                         >
                           ✓ Accept & Chat
                         </Button>
                         <Button 
                           onClick={() => handleReject(req.id)} 
                           variant="outline" 
-                          className="text-red-600 border-red-300 hover:bg-red-50"
+                          className="flex-1 sm:flex-none text-red-600 border-red-300 hover:bg-red-50"
                         >
                           ✕ Decline
                         </Button>
@@ -251,18 +252,19 @@ export const TherapistDashboard: React.FC<{ onBack?: () => void }> = ({ onBack }
               <div className="space-y-3">
                 {acceptedRequests.map(req => (
                   <div key={req.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:items-center">
                       <div>
                         <div className="font-medium text-gray-900">
-                          {req.users?.email || req.user_id}
+                          {req.users?.username || req.users?.email || req.user_id}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          Connected: {new Date(req.created_at).toLocaleDateString()}
+                          {req.users?.email && <div>{req.users.email}</div>}
+                          <div>Connected: {new Date(req.created_at).toLocaleDateString()}</div>
                         </div>
                       </div>
                       <Button 
                         onClick={() => openChatWith(req.user_id)} 
-                        className="bg-blue-600 text-white hover:bg-blue-700"
+                        className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700"
                       >
                         💬 Open Chat
                       </Button>
