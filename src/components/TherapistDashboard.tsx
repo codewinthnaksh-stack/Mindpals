@@ -221,14 +221,13 @@ export const TherapistDashboard: React.FC<{ onBack?: () => void }> = ({ onBack }
                             handleAccept(req.id); 
                             openChatWith(req.user_id); 
                           }} 
-                          className="flex-1 sm:flex-none bg-green-600 text-white hover:bg-green-700"
+                          className="flex-1 sm:flex-none px-4 py-2 bg-green-600 text-white font-semibold border-2 border-green-600 rounded-lg hover:bg-green-700 hover:border-green-700 shadow-md transition-all"
                         >
                           ✓ Accept & Chat
                         </Button>
                         <Button 
                           onClick={() => handleReject(req.id)} 
-                          variant="outline" 
-                          className="flex-1 sm:flex-none text-red-600 border-red-300 hover:bg-red-50"
+                          className="flex-1 sm:flex-none px-4 py-2 text-red-600 border-2 border-red-300 rounded-lg bg-white hover:bg-red-50 font-semibold shadow-md transition-all"
                         >
                           ✕ Decline
                         </Button>
@@ -264,7 +263,7 @@ export const TherapistDashboard: React.FC<{ onBack?: () => void }> = ({ onBack }
                       </div>
                       <Button 
                         onClick={() => openChatWith(req.user_id)} 
-                        className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700"
+                        className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white font-semibold border-2 border-green-600 rounded-lg hover:bg-green-700 hover:border-green-700 shadow-md transition-all"
                       >
                         💬 Open Chat
                       </Button>
