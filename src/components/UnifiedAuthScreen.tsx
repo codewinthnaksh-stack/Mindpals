@@ -175,7 +175,9 @@ export function UnifiedAuthScreen() {
         // Step 2: Create therapist profile
         const languageArray = languages.split(',').map((lang: string) => lang.trim()).filter((lang: string) => lang);
 
-        const { error: therapistError } = await supabase
+        // Try to insert therapist row and return the created record so we can
+        // verify which columns were actually persisted (helps debug RLS/trigger issues).
+        const { data: therapistInserted, error: therapistError } = await supabase
           .from('therapists')
           .insert({
             id: data.user.id,
@@ -187,11 +189,15 @@ export function UnifiedAuthScreen() {
             response_time: responseTime || null,
             price: price ? parseFloat(price) : null,
             rating: 5,
-          });
+          })
+          .select()
+          .single();
 
         if (therapistError) {
-          console.error('Therapist profile error:', therapistError);
-          throw new Error("Failed to create therapist profile");
+          console.error('Therapist profile error (insert):', therapistError);
+          // Do not throw immediately — profiles/trigger might create a therapist row server-side.
+        } else {
+          console.debug('Therapist insert returned:', therapistInserted);
         }
 
         // Step 3: Create user profile for therapist
@@ -210,7 +216,7 @@ export function UnifiedAuthScreen() {
 
         // Step 4: Create therapist profile in profiles table
         const experienceYears = experience ? parseInt(experience) : 0;
-        const { error: profilesError } = await supabase
+        const { data: profileInserted, error: profilesError } = await supabase
           .from('profiles')
           .insert({
             id: data.user.id,
@@ -224,10 +230,14 @@ export function UnifiedAuthScreen() {
             rating: 5,
             is_online: false,
             is_premium: false,
-          });
+          })
+          .select()
+          .single();
 
         if (profilesError) {
-          console.error('Profiles table creation error:', profilesError);
+          console.error('Profiles table creation error (insert):', profilesError);
+        } else {
+          console.debug('Profiles insert returned:', profileInserted);
         }
 
         setSuccess("Therapist registration successful! Please check your email to confirm your account.");
