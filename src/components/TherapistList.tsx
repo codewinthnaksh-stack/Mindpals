@@ -11,9 +11,25 @@ export const TherapistList: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await fetchTherapists();
-      setTherapists(data || []);
-      setLoading(false);
+      try {
+        const res = await fetchTherapists();
+        // supabase client returns { data, error }
+        const data = res?.data;
+        const error = (res as any)?.error;
+        console.debug('fetchTherapists response', { data, error });
+        if (error) {
+          console.error('Error fetching therapists:', error);
+          // show empty list but stop loading
+          setTherapists([]);
+        } else {
+          setTherapists(data || []);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching therapists:', err);
+        setTherapists([]);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -44,44 +60,48 @@ export const TherapistList: React.FC = () => {
     <div className="p-6">
       <h2 className="text-2xl font-semibold mb-4">Available Therapists</h2>
 
-      <textarea 
-        className="w-full p-3 rounded border mb-4" 
-        placeholder="Personal message (optional)" 
-        value={message} 
-        onChange={e => setMessage(e.target.value)} 
+      <textarea
+        className="w-full p-3 rounded border mb-4"
+        placeholder="Personal message (optional)"
+        value={message}
+        onChange={e => setMessage(e.target.value)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {therapists.map(t => (
-          <Card key={t.id} className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold">{t.name}</h3>
-                <p className="text-sm text-gray-600">{t.specialization}</p>
-                <p className="text-xs text-gray-500">
-                  {t.experience} • {t.languages?.join(', ')}
-                </p>
+      {therapists.length === 0 ? (
+        <div className="p-6 text-gray-600">No therapists available right now. Please check back later.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {therapists.map(t => (
+            <Card key={t.id} className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-semibold">{t.name}</h3>
+                  <p className="text-sm text-gray-600">{t.specialization}</p>
+                  <p className="text-xs text-gray-500">
+                    {t.experience} • {t.languages?.join(', ')}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm">⭐ {Number(t.rating || 5).toFixed(1)}</div>
+                  <div className="text-sm text-gray-500">{t.response_time}</div>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm">⭐ {Number(t.rating || 5).toFixed(1)}</div>
-                <div className="text-sm text-gray-500">{t.response_time}</div>
+
+              <p className="mt-3 text-sm text-gray-700">{t.description}</p>
+
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-lg font-semibold">₹{t.price || 0}/session</div>
+                <Button
+                  onClick={() => handleRequest(t.id)}
+                  className="bg-purple-600 text-white rounded-full hover:bg-purple-700"
+                >
+                  Request Connection
+                </Button>
               </div>
-            </div>
-
-            <p className="mt-3 text-sm text-gray-700">{t.description}</p>
-
-            <div className="mt-4 flex justify-between items-center">
-              <div className="text-lg font-semibold">₹{t.price || 0}/session</div>
-              <Button 
-                onClick={() => handleRequest(t.id)} 
-                className="bg-purple-600 text-white rounded-full hover:bg-purple-700"
-              >
-                Request Connection
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
