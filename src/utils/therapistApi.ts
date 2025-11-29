@@ -30,11 +30,24 @@ export const fetchTherapists = async () => {
 };
 
 export const fetchTherapistRequestsFor = async (therapistId: string) => {
-  return await supabase
+  // Try to fetch requests including user metadata. If the users relation is blocked
+  // by RLS, fallback to fetching only therapist_requests rows.
+  const res = await supabase
     .from('therapist_requests')
     .select('*, users(*)')
     .eq('therapist_id', therapistId)
     .order('created_at', { ascending: false });
+
+  if ((res as any)?.error) {
+    // Fallback without joining users
+    return await supabase
+      .from('therapist_requests')
+      .select('*')
+      .eq('therapist_id', therapistId)
+      .order('created_at', { ascending: false });
+  }
+
+  return res;
 };
 
 export const updateRequestStatus = async (requestId: string, status: string) => {
