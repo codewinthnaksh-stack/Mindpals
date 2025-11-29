@@ -50,6 +50,15 @@ export const fetchTherapistRequestsFor = async (therapistId: string) => {
   return res;
 };
 
+// Fetch all requests sent BY a user to see their connection status with therapists
+export const fetchUserRequestsSent = async (userId: string) => {
+  return await supabase
+    .from('therapist_requests')
+    .select('*, therapists(*)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+};
+
 export const updateRequestStatus = async (requestId: string, status: string) => {
   return await supabase
     .from('therapist_requests')
