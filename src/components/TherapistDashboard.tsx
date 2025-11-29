@@ -90,6 +90,7 @@ export const TherapistDashboard: React.FC<{ onBack?: () => void }> = ({ onBack }
 
   const loadRequests = async (therapistId: string) => {
     const { data, error } = await fetchTherapistRequestsFor(therapistId);
+    console.debug('fetchTherapistRequestsFor response', { data, error });
     if (error) {
       console.error('Error loading requests:', error);
     }
