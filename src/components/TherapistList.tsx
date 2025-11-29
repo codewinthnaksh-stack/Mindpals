@@ -40,12 +40,15 @@ export const TherapistList: React.FC = () => {
       return;
     }
     
-    const { error } = await sendConnectionRequest({ 
-      user_id: user.id, 
-      therapist_id: therapistId, 
-      message 
+    const res = await sendConnectionRequest({
+      user_id: user.id,
+      therapist_id: therapistId,
+      message,
     });
-    
+
+    console.debug('sendConnectionRequest response', res);
+
+    const error = (res as any)?.error;
     if (error) {
       alert('Error sending request: ' + error.message);
     } else {
